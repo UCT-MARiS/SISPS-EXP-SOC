@@ -1,0 +1,20 @@
+{
+  "version": "0.2",
+  "ignorePaths": [],
+  "dictionaryDefinitions": [],
+  "dictionaries": [],
+  "words": [
+    "figsize",
+    "nrows",
+    "skiprows",
+    "usecols",
+    "xlabel",
+    "yaxis",
+    "ylabel",
+    "ylim",
+    "Zimg",
+    "Zreal"
+  ],
+  "ignoreWords": [],
+  "import": []
+}
