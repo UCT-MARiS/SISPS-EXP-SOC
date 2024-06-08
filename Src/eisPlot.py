@@ -1,9 +1,10 @@
 import os
+from typing import Dict, Tuple
+
 import matplotlib.pyplot as plt
 from matplotlib.axes import Axes
 
 from eisImport import EisData
-from typing import Dict, Tuple
 
 
 def plotNyquist(
@@ -89,7 +90,7 @@ def plotNyquist(
 
     figure.set_size_inches(figsize)
 
-    if len(eis) == 1:
+    if len(eis) == 1 and title is None:
         title = list(eis.keys())[0]
         assert title is not None
         plot.set_title(title)
