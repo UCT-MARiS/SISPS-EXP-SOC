@@ -1,10 +1,11 @@
 import copy
+from dataclasses import dataclass
 import pandas as pd
 import regex as re
 import sys
 
 from eisImport import EisData
-from typing import Dict
+from typing import Dict, Optional
 
 
 def filterNegativeReal(eis: Dict[str, EisData]) -> Dict[str, EisData]:
@@ -73,9 +74,16 @@ def filterSingleOutlier(eis: Dict[str, EisData]) -> Dict[str, EisData]:
     return eisCopy
 
 
-def renameLabels(eis):
+def renameLabels(eis: Dict[str, EisData]) -> Dict[str, EisData]:
     """
-    Renames the labels of the EIS data to a consistent format.
+    Renames the labels of the EIS data to a consistent format:
+
+    e.g. `UCT_AST9AH_B01_RT01`
+    - `UCT_AST9AH` is a prefix
+    - `B01` is the battery number
+    - `RT01` is the temperature
+
+    The original labels remain available in the `Comment` field of the `EisData` object.
 
     Parameters:
     - eis (Dict[str, EisData]): A dictionary containing EIS data, where the keys are spectra names and the values are EisData objects.
@@ -105,19 +113,32 @@ def renameLabels(eis):
 
         if newSpectraName not in eis:
             print(f"Rename: \u27A4 {spectra:<25} \u27A4 {newSpectraName}")
+        else:
+            print(f"Unchanged: \u27A4 {newSpectraName}")
 
         renamedEis[newSpectraName] = eis[spectra]
 
     return renamedEis
 
 
-def disambiguateLabel(label):
+@dataclass
+class EisLabelDisambiguation:
+    batteryBatch: str
+    batteryNumber: str
+    temperature: str
+    runRepetition: Optional[str] = None
+
+
+def disambiguateLabel(label) -> EisLabelDisambiguation:
     batteryBatch = re.search(r"(A-B)(?>\d{2})", label).group(1)  # type: ignore
     batteryNumber = re.search(r"(A-B)(\d{2})", label).group(2)  # type: ignore
     temperature = re.search(r"RT\d|-40|-30|-20|-10|00", label).group(0)  # type: ignore
+    runRepetitionMatch = re.search(r"(\s\d$)", label)
+    runRepetition = runRepetitionMatch.group(0) if runRepetitionMatch else None
 
-    return {
-        "batteryBatch": batteryBatch,
-        "batteryNumber": batteryNumber,
-        "temperature": temperature,
-    }
+    return EisLabelDisambiguation(
+        batteryBatch,
+        batteryNumber,
+        temperature,
+        runRepetition,
+    )
