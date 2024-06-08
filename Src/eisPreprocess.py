@@ -1,5 +1,7 @@
 import copy
 import pandas as pd
+import regex as re
+import sys
 
 from eisImport import EisData
 from typing import Dict
@@ -71,36 +73,51 @@ def filterSingleOutlier(eis: Dict[str, EisData]) -> Dict[str, EisData]:
     return eisCopy
 
 
-# import regex as re
+def renameLabels(eis):
+    """
+    Renames the labels of the EIS data to a consistent format.
+
+    Parameters:
+    - eis (Dict[str, EisData]): A dictionary containing EIS data, where the keys are spectra names and the values are EisData objects.
+
+    Returns:
+    - Dict[str, EisData]: A dictionary containing EIS data, where the keys are spectra names and the values are EisData objects with renamed labels.
+    """
+    prefix = "UCT_AST9AH_"
+
+    renamedEis = {}
+    for spectra in eis:
+        battery = re.search(r"(A|B)\d{2}", spectra).group(0)  # type: ignore
+
+        temperature = re.search(r"RT\d?|-40|-30|-20|-10|00|_\+00|_0", spectra).group(0)  # type: ignore
+        if temperature == "_+00" or temperature == "_0":
+            temperature = "00"
+        if temperature == "RT":
+            temperature = "RT1"
+
+        runRepetition = re.search(r"(\s\d$)", spectra)
+
+        newSpectraName = prefix + battery + "_" + temperature
+        if runRepetition:
+            newSpectraName += runRepetition.group(0)
+
+        assert newSpectraName not in renamedEis, f"Duplicate key {newSpectraName}"
+
+        if newSpectraName not in eis:
+            print(f"Rename: \u27A4 {spectra:<25} \u27A4 {newSpectraName}")
+
+        renamedEis[newSpectraName] = eis[spectra]
+
+    return renamedEis
 
 
-# def renameLabels(eis):
-#     prefix = "UCT_AST9AH_"
+def disambiguateLabel(label):
+    batteryBatch = re.search(r"(A-B)(?>\d{2})", label).group(1)  # type: ignore
+    batteryNumber = re.search(r"(A-B)(\d{2})", label).group(2)  # type: ignore
+    temperature = re.search(r"RT\d|-40|-30|-20|-10|00", label).group(0)  # type: ignore
 
-#     renamedEis = {}
-#     for spectra in eis:
-#         battery = re.search(r"(A|B)\d{2}", spectra).group(0)  # type: ignore
-
-#         temperature = re.search(r"RT\d?|-40|-30|-20|-10|00|_\+00|_0", spectra).group(0)  # type: ignore
-#         if temperature == "_+00" or temperature == "_0":
-#             temperature = "00"
-#         if temperature == "RT":
-#             temperature = "RT1"
-
-#         newSpectraName = prefix + battery + "_" + temperature
-
-#         renamedEis[newSpectraName] = eis[spectra]
-
-#     return renamedEis
-
-
-# def disambiguateLabel(label):
-#     batteryBatch = re.search(r"(A|B)(?>\d{2})", label).group(1)  # type: ignore
-#     batteryNumber = re.search(r"(A|B)(\d{2})", label).group(2)  # type: ignore
-#     temperature = re.search(r"RT\d|-40|-30|-20|-10|00", label).group(0)  # type: ignore
-
-#     return {
-#         "batteryBatch": batteryBatch,
-#         "batteryNumber": batteryNumber,
-#         "temperature": temperature,
-# }
+    return {
+        "batteryBatch": batteryBatch,
+        "batteryNumber": batteryNumber,
+        "temperature": temperature,
+    }
