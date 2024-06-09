@@ -130,10 +130,18 @@ class EisLabelDisambiguation:
 
 
 def disambiguateLabel(label) -> EisLabelDisambiguation:
-    batteryBatch = re.search(r"(A-B)(?>\d{2})", label).group(1)  # type: ignore
-    batteryNumber = re.search(r"(A-B)(\d{2})", label).group(2)  # type: ignore
-    temperature = re.search(r"RT\d|-40|-30|-20|-10|00", label).group(0)  # type: ignore
+    batteryBatchMatch = re.search(r"(A|B)(?>\d{2})", label)
+    batteryNumberMatch = re.search(r"(A|B)(\d{2})", label)
+    temperatureMatch = re.search(r"RT\d|-40|-30|-20|-10|00", label)
     runRepetitionMatch = re.search(r"(\s\d$)", label)
+
+    assert batteryBatchMatch, f"Invalid label {label}"
+    assert batteryNumberMatch, f"Invalid label {label}"
+    assert temperatureMatch, f"Invalid label {label}"
+
+    batteryBatch = batteryBatchMatch.group(1)  # type: ignore
+    batteryNumber = batteryNumberMatch.group(2)  # type: ignore
+    temperature = temperatureMatch.group(0)  # type: ignore
     runRepetition = runRepetitionMatch.group(0) if runRepetitionMatch else None
 
     return EisLabelDisambiguation(

@@ -11,6 +11,8 @@
     "isin",
     "isna",
     "nrows",
+    "nulled",
+    "sharey",
     "skiprows",
     "suptitle",
     "usecols",
@@ -18,6 +20,7 @@
     "xlim",
     "yaxis",
     "ylabel",
+    "ylim",
     "Zimg",
     "Zreal"
   ],
