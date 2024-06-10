@@ -34,6 +34,9 @@ class EisData:
     data: pd.DataFrame
     metadata: Dict[str, str]
 
+    def __repr__(self) -> str:
+        return f"EisData: {self.metadata["Comment"]}"
+
 
 @cache
 def readEisFile(file: str) -> EisData:

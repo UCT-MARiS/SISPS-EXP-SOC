@@ -66,9 +66,6 @@ def splitByBatteryNumber(eisData: Dict[str, EisData]) -> Dict[str, Dict[str, Eis
 
 
 socMap = {
-    """
-    A dictionary mapping battery names to their state of charge (SoC) as specified in the Methodology.
-    """
     "A01": "100%",
     "A02": "93%",
     "A03": "87%",
