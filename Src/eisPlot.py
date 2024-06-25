@@ -13,6 +13,7 @@ def plotNyquist(
     imagLabel="Imaginary Impedance (mΩ)",
     ax: Axes | None = None,
     scatter: bool = False,
+    limitFrequencyLabels: bool = False,
     saveDir: str | None = None,
     fileName: str | None = None,
     transparent: bool = False,
@@ -28,6 +29,7 @@ def plotNyquist(
         imagLabel (str, optional): Label for the imaginary impedance axis. Defaults to "Imaginary Impedance (mΩ)".
         ax (Axes | None, optional): The matplotlib Axes object to plot on. Defaults to None.
         scatter (bool, optional): If the plot should be a scatter plot. Defaults to False (line plot).
+        limitFrequencyLabels (bool, optional): Add labels to indicate the frequency limits. Defaults to False.
         saveDir (str | None, optional): The directory to save the plot image. Defaults to None.
         fileName (str | None, optional): The filename of the saved plot image. Only effects if saveDir is not None.
         transparent (bool, optional): If the saved plot should be transparent. Defaults to False. Only effects if saveDir is not None.
@@ -79,6 +81,18 @@ def plotNyquist(
             label=spectra,
         )
         ax = plot
+        if limitFrequencyLabels:
+            idFreq = [
+                eis[spectra].data["ActFreq"].idxmin(),
+                eis[spectra].data["ActFreq"].idxmax(),
+            ]
+            for id in idFreq:
+                plot.text(
+                    eis[spectra].data["Zreal1"].iloc[id] * 1.01,
+                    eis[spectra].data["Zimg1"].iloc[id],
+                    f"{eis[spectra].data['ActFreq'].iloc[id]:.0f} Hz",
+                    fontsize=8,
+                )
 
     plot.invert_yaxis()
     plot.set_aspect("equal", adjustable="box")

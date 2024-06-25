@@ -1,5 +1,4 @@
-import regex as re
-from typing import Dict, List
+from typing import Dict
 
 from eisImport import EisData
 from eisPreprocess import disambiguateLabel
