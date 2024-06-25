@@ -2,7 +2,6 @@ import copy
 from dataclasses import dataclass
 import pandas as pd
 import regex as re
-import sys
 
 from eisImport import EisData
 from typing import Dict, Optional
@@ -129,7 +128,7 @@ class EisLabelDisambiguation:
     runRepetition: Optional[str] = None
 
 
-def disambiguateLabel(label) -> EisLabelDisambiguation:
+def disambiguateLabel(label: str) -> EisLabelDisambiguation:
     batteryBatchMatch = re.search(r"(A|B)(?>\d{2})", label)
     batteryNumberMatch = re.search(r"(A|B)(\d{2})", label)
     temperatureMatch = re.search(r"RT\d|-40|-30|-20|-10|00", label)
@@ -139,9 +138,9 @@ def disambiguateLabel(label) -> EisLabelDisambiguation:
     assert batteryNumberMatch, f"Invalid label {label}"
     assert temperatureMatch, f"Invalid label {label}"
 
-    batteryBatch = batteryBatchMatch.group(1)  # type: ignore
-    batteryNumber = batteryNumberMatch.group(2)  # type: ignore
-    temperature = temperatureMatch.group(0)  # type: ignore
+    batteryBatch = batteryBatchMatch.group(1)
+    batteryNumber = batteryNumberMatch.group(2)
+    temperature = temperatureMatch.group(0)
     runRepetition = runRepetitionMatch.group(0) if runRepetitionMatch else None
 
     return EisLabelDisambiguation(
