@@ -35,7 +35,7 @@ class EisData:
     metadata: Dict[str, str]
 
     def __repr__(self) -> str:
-        return f"EisData: {self.metadata["Comment"]}"
+        return f"EisData: {self.metadata['Comment']}"
 
 
 @cache
