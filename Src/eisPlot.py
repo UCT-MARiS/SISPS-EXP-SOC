@@ -14,6 +14,7 @@ def plotNyquist(
     ax: Axes | None = None,
     scatter: bool = False,
     saveDir: str | None = None,
+    fileName: str | None = None,
     transparent: bool = False,
     title: str | None = None,
     figsize: Tuple[int, int] = (16, 12),
@@ -28,6 +29,7 @@ def plotNyquist(
         ax (Axes | None, optional): The matplotlib Axes object to plot on. Defaults to None.
         scatter (bool, optional): If the plot should be a scatter plot. Defaults to False (line plot).
         saveDir (str | None, optional): The directory to save the plot image. Defaults to None.
+        fileName (str | None, optional): The filename of the saved plot image. Only effects if saveDir is not None.
         transparent (bool, optional): If the saved plot should be transparent. Defaults to False. Only effects if saveDir is not None.
         title (str | None, optional): The title of the plot. Defaults to None.
         figsize (Tuple[int, int], optional): The size of the plot figure. Defaults to (16, 12).
@@ -114,7 +116,11 @@ def plotNyquist(
 
     if saveDir is not None:
         os.makedirs(saveDir, exist_ok=True)
-        savePath = os.path.join(saveDir, f"{spectra}.png")
+        savePath = (
+            os.path.join(saveDir, f"{spectra}.png")
+            if fileName is None
+            else os.path.join(saveDir, fileName)
+        )
 
         assert plot.figure is not None
         figure.savefig(
