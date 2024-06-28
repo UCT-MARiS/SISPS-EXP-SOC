@@ -3,6 +3,7 @@ from typing import Dict, Tuple
 
 import matplotlib.pyplot as plt
 from matplotlib.axes import Axes
+import pandas as pd
 
 from eisImport import EisData
 
@@ -146,3 +147,46 @@ def plotNyquist(
         return None
     else:
         return plot
+
+
+def plotEisTestTemperatureRanges(
+    eisObservations: Dict[str, Dict[str, pd.DataFrame]]
+) -> plt.Figure:
+    fig, ax = plt.subplots(
+        2,
+        1,
+        sharex=True,
+        figsize=(16, 32),
+        # squeeze=True,
+    )
+    fig.suptitle("EIS Test Temperatures")
+    ax[0].set_title("Batch A")
+    ax[1].set_title("Batch B")
+    ax[0].grid(True)
+    ax[1].grid(True)
+
+    for batch in eisObservations:
+        axIndex = 0 if batch == "A" else 1
+        for temperature in eisObservations[batch]:
+            # Plot a bar chart of ranges "Battery Min Temperature" to "Battery Max Temperature"
+            for row in eisObservations[batch][temperature].iterrows():
+                try:
+                    minTemp = float(row[1]["Battery Min Temperature"])
+                    maxTemp = float(row[1]["Battery Max Temperature"])
+                except ValueError:
+                    continue
+
+                ax[axIndex].barh(
+                    y=row[1]["Test"],
+                    width=maxTemp - minTemp,
+                    left=minTemp,
+                )
+
+                if minTemp == maxTemp:
+                    # Special case for when minTemp == maxTemp, plot a single point
+                    ax[axIndex].scatter(
+                        x=minTemp,
+                        y=row[1]["Test"],
+                    )
+
+    return fig

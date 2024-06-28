@@ -82,3 +82,98 @@ def readEisFiles(files: List[str]) -> Dict[str, EisData]:
             eisData  # Comment set as unique key during experiment.
         )
     return eis
+
+
+def readMeasurementsAndObservations(
+    file: str,
+    discardColumns: list = [],
+) -> pd.DataFrame:
+    """
+    Read the EIS measurements and observations table from the experiment spreadsheet.
+    """
+
+    # Raw reading needed to locate sub-tables within sheet.
+    rawRead = pd.read_excel(
+        file,
+        sheet_name="Data",
+        header=None,
+    )
+
+    # Find the row where ""3. Cooling & EIS" is located. This marks start of the EIS measurements table.
+
+    # Offset from the "3. Cooling & EIS" row to the start of the EIS table.
+    START_ROW_OFFSET = 10  # ! This may break if the spreadsheet format changes.
+
+    startRow = rawRead[rawRead[0] == "3. Cooling & EIS"].index[0] + START_ROW_OFFSET
+    emptyRows = rawRead[rawRead[0].isnull()].index
+    endRow = emptyRows[emptyRows > startRow][0]
+    assert (
+        endRow - startRow - 1 == 140
+    ), f"Expected 140 rows of data, got {endRow - startRow - 1} rows."
+
+    if len(discardColumns) == 0:
+        discardedColumns = ["Due"]  # Generally not useful
+
+    eisObservations = pd.read_excel(
+        file,
+        sheet_name="Data",
+        header=startRow,
+        nrows=endRow - startRow,
+        usecols=lambda col: col not in discardedColumns,
+    ).fillna("")
+
+    return eisObservations
+
+
+def groupMeasurementsAndObservations(
+    observations: pd.DataFrame,
+) -> Dict[str, pd.DataFrame]:
+    """
+    Group the measurements and observations table by batch and then temperature of measurement.
+    The expected table follows a strict format which this function assumes.
+    """
+
+    def groupByTemperature(batchObservations: pd.DataFrame) -> Dict[str, pd.DataFrame]:
+        """
+        Group the batch observations by temperature of measurement.
+        """
+        assert len(batchObservations) == 70
+
+        temperatureKeys = [
+            "RT1",
+            "-40",
+            "-30",
+            "-20",
+            "-10",
+            "00",
+            "RT2",
+        ]
+
+        grouped = {
+            f"{temperatureKeys[i]}": batchObservations.iloc[i * 10 : (i + 1) * 10]
+            for i in range(len(temperatureKeys))
+        }
+        return grouped
+
+    batchKeys = ["A", "B"]
+    grouped = {
+        key: groupByTemperature(
+            observations[observations["Battery"].apply(lambda x: x[11] == key)]
+        )
+        for key in batchKeys
+    }
+    return grouped
+
+
+def inferObservationTestNames(
+    groupedObservations: Dict[str, Dict[str, pd.DataFrame]]
+) -> None:
+    """
+    Infer the test name from the grouped observations and add it as a column to the observations.
+    """
+
+    for batch in groupedObservations:
+        for temperature in groupedObservations[batch]:
+            for row in groupedObservations[batch][temperature].iterrows():
+                testName = f"{row[1]['Battery']}_{temperature}"
+                groupedObservations[batch][temperature].at[row[0], "Test"] = testName
