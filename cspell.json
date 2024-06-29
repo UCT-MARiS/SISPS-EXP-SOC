@@ -4,6 +4,7 @@
   "dictionaryDefinitions": [],
   "dictionaries": ["python"],
   "words": [
+    "barh",
     "Digatron",
     "downcasting",
     "figsize",
@@ -15,8 +16,10 @@
     "iloc",
     "isin",
     "isna",
+    "iterrows",
     "nrows",
     "nulled",
+    "sharex",
     "sharey",
     "skiprows",
     "suptitle",

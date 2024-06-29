@@ -1,8 +1,10 @@
 import os
-from typing import Dict, Tuple
+from typing import Dict, Tuple, TypedDict
 
 import matplotlib.pyplot as plt
+from matplotlib.figure import Figure
 from matplotlib.axes import Axes
+
 import pandas as pd
 
 from eisImport import EisData
@@ -149,8 +151,42 @@ def plotNyquist(
         return plot
 
 
+class EisDataComparison(TypedDict):
+    class EisDataNameValue(TypedDict):
+        name: str
+        value: EisData
+
+    eis1: EisDataNameValue
+    eis2: EisDataNameValue
+
+
+def plotNyquistComparison(
+    eis1: EisDataComparison,
+    eis2: EisDataComparison,
+    mainTitle: str,
+    figsize=(8, 5),
+) -> Figure:
+
+    fig, axs = plt.subplots(1, 2, figsize=figsize)
+    fig.suptitle(mainTitle)
+
+    for eis, ax in zip([eis1, eis2], axs):
+        plotNyquist(
+            {eis["name"]: eis["value"]},
+            title=eis["name"],
+            ax=ax,
+        )
+
+    axs[0].legend().set_visible(False)
+    axs[1].legend().set_visible(False)
+    axs[1].set_ylabel("")
+    fig.tight_layout()
+
+
 def plotEisTestTemperatureRanges(
-    eisObservations: Dict[str, Dict[str, pd.DataFrame]]
+    eisObservations: Dict[str, Dict[str, pd.DataFrame]],
+    saveDir: str | None = None,
+    fileName: str | None = None,
 ) -> plt.Figure:
     fig, ax = plt.subplots(
         2,
@@ -188,5 +224,11 @@ def plotEisTestTemperatureRanges(
                         x=minTemp,
                         y=row[1]["Test"],
                     )
+
+    if saveDir is not None:
+        os.makedirs(saveDir, exist_ok=True)
+        savePath = os.path.join(saveDir, fileName)
+        fig.savefig(savePath)
+        plt.close(fig)
 
     return fig
