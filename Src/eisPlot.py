@@ -1,4 +1,6 @@
 import os
+from concurrent import futures
+
 from typing import Dict, Tuple, TypedDict
 
 import matplotlib.pyplot as plt
@@ -149,6 +151,39 @@ def plotNyquist(
         return None
     else:
         return plot
+
+
+def plotIndividualNyquist(
+    eisData: Dict[str, EisData],
+    saveDir,
+    scatter=False,
+) -> None:
+    """
+    Plots individual Nyquist plots for each EIS data set in the dictionary.
+
+    Args:
+        eisData (dict): A dictionary containing EIS data sets.
+        saveDir (str): The directory where the plots will be saved.
+        scatter (bool, optional): Whether to include scatter points in the plot. Defaults to False.
+
+    Returns:
+        None
+
+    This function is parallelized to speed up the plotting process and is intended for long dictionaries only.
+
+    If the specified save directory does not exist, it will be created. If it already exists, the function will skip the plotting process (speeds up re-runs).
+    """
+    if os.path.exists(saveDir) == False:
+        with futures.ThreadPoolExecutor() as executor:
+            for eis in eisData:
+                executor.submit(
+                    plotNyquist,
+                    {eis: eisData[eis]},
+                    saveDir=saveDir,
+                    scatter=scatter,
+                    transparent=True,
+                    limitFrequencyLabels=True,
+                )
 
 
 class EisDataComparison(TypedDict):
