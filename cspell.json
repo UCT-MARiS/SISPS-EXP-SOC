@@ -19,6 +19,7 @@
     "iterrows",
     "nrows",
     "nulled",
+    "openpyxl",
     "sharex",
     "sharey",
     "skiprows",
