@@ -210,6 +210,7 @@ def plotNyquistComparison(
             {eis["name"]: eis["value"]},
             title=eis["name"],
             ax=ax,
+            figsize=(figsize[0] / 2, figsize[1] / 2),
         )
 
     axs[0].legend().set_visible(False)
