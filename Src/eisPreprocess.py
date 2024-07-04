@@ -4,7 +4,7 @@ import pandas as pd
 import regex as re
 
 from eisImport import EisData
-from typing import Dict, Optional
+from typing import Dict, List, Optional
 
 
 def filterNegativeReal(eis: Dict[str, EisData]) -> Dict[str, EisData]:
@@ -28,7 +28,9 @@ def filterNegativeReal(eis: Dict[str, EisData]) -> Dict[str, EisData]:
     return eisCopy
 
 
-def filterSingleOutlier(eis: Dict[str, EisData]) -> Dict[str, EisData]:
+def filterSingleOutlier(
+    eis: Dict[str, EisData]
+) -> tuple[Dict[str, EisData], List[str]]:
     """
     Filters outlying points in EIS data where the difference between points n and n+1 is greater than that between points n to n+2.
 
@@ -37,9 +39,12 @@ def filterSingleOutlier(eis: Dict[str, EisData]) -> Dict[str, EisData]:
 
     Returns:
     - Dict[str, EisData]: A filtered dictionary of EIS data, where the keys are spectra names and the values are EisData objects.
+    - List[str]: A list of spectra names that were modified by the filtering process.
 
     """
     eisCopy = copy.deepcopy(eis)
+    modifiedSpectra = []
+
     for spectra in eisCopy:
         spectrum = eisCopy[spectra]
         data = spectrum.data
@@ -47,7 +52,7 @@ def filterSingleOutlier(eis: Dict[str, EisData]) -> Dict[str, EisData]:
         diff1 = (data["Zreal1"].diff(-1) + 1j * data["Zimg1"].diff(-1)).abs()
         diff2 = (data["Zreal1"].diff(-2) + 1j * data["Zimg1"].diff(-2)).abs()
 
-        # Option context responding Deprecation warning on fillna as at June 2024
+        # Option context suppressing Deprecation warning on fillna as at June 2024
         with pd.option_context("future.no_silent_downcasting", True):
             data = data[
                 ((diff1 < 2 * diff2) | (diff1.isna()) | (diff2.isna()))
@@ -58,6 +63,7 @@ def filterSingleOutlier(eis: Dict[str, EisData]) -> Dict[str, EisData]:
         eisCopy[spectra].data = data
 
         if len(data) < len(eis[spectra].data):
+            modifiedSpectra.append(spectra)
 
             # Find the frequencies of the dropped points from the ActFreq field
             droppedFrequencies = (
@@ -70,7 +76,7 @@ def filterSingleOutlier(eis: Dict[str, EisData]) -> Dict[str, EisData]:
                 f"Filtered {len(eis[spectra].data) - len(data)} outliers from {spectra} at frequencies {droppedFrequencies}Hz"
             )
 
-    return eisCopy
+    return (eisCopy, modifiedSpectra)
 
 
 def renameLabels(eis: Dict[str, EisData]) -> Dict[str, EisData]:
