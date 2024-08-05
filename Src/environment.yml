@@ -1,0 +1,14 @@
+name: SISPS-AST9AH-EIS
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - ipykernel
+  - matplotlib
+  - numpy
+  - pandas
+  - regex
+  - openpyxl
+  - pip
+  - pip:
+      - duration
