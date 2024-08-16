@@ -218,6 +218,8 @@ def plotNyquistComparison(
     axs[1].set_ylabel("")
     fig.tight_layout()
 
+    return fig
+
 
 def plotEisTestTemperatureRanges(
     eisObservations: Dict[str, Dict[str, pd.DataFrame]],
@@ -265,6 +267,5 @@ def plotEisTestTemperatureRanges(
         os.makedirs(saveDir, exist_ok=True)
         savePath = os.path.join(saveDir, fileName)
         fig.savefig(savePath)
-        plt.close(fig)
 
     return fig
