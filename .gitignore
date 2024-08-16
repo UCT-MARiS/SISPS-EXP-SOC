@@ -1,5 +1,8 @@
 .DS_Store
-~$*
-__pycache__
-Plots/**
+
 .vscode/settings.json
+
+Plots/**
+
+__pycache__
+.conda
