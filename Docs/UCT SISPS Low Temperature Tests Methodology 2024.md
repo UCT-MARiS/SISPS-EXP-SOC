@@ -44,6 +44,7 @@ Please follow the following scheme to identify samples:
 
 | Category            | Naming Type             |
 | :------------------ | :---------------------- |
+| Order Number        | UCT002                  |
 | Prefix              | UCT_AST9AH_             |
 | Batch               | Alpha (A, B, C, ...)    |
 | Battery             | Numeric (1, 2, 3, ...)  |
