@@ -1,7 +1,7 @@
 from typing import Dict
 
-from eisImport import EisData
-from eisPreprocess import disambiguateLabel
+from .eisImport import EisData
+from .eisPreprocess import disambiguateLabel
 
 
 def splitByBatch(eisData: Dict[str, EisData]) -> Dict[str, Dict[str, EisData]]:

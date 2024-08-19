@@ -3,7 +3,7 @@ from dataclasses import dataclass
 import pandas as pd
 import regex as re
 
-from eisImport import EisData
+from .eisImport import EisData
 from typing import Dict, List, Optional
 
 
