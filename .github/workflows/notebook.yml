@@ -1,0 +1,56 @@
+name: Jupyter Notebook Execute
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - "Notebook/**"
+      - "Data/**"
+      - ".github/workflows/notebook.yml"
+
+jobs:
+  main:
+    name: Execute Notebook/main.ipynb
+    runs-on: macos-13 # 14GB RAM required
+
+    timeout-minutes: 10
+
+    defaults:
+      run:
+        shell: bash -el {0} # Required by conda-incubator/setup-miniconda
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Anaconda
+        uses: conda-incubator/setup-miniconda@v3
+        with:
+          activate-environment: ./.conda
+          environment-file: Notebook/environment.yml
+          python-version: 3.11
+          auto-activate-base: false
+
+      - name: Conda Info
+        run: |
+          conda info
+          conda list
+
+      - name: Install Jupyter within Conda Kernel
+        run: |
+          conda activate ./.conda
+          conda install jupyter
+          jupyter kernelspec install --user ./.conda --name .conda
+          jupyter kernelspec list
+
+      - name: Execute Jupyter Notebook
+        run: jupyter nbconvert --to notebook --execute --inplace Notebook/main.ipynb
+
+      - name: Upload Output
+        uses: actions/upload-artifact@v4
+        with:
+          name: Notebook Outputs
+          path: |
+            Notebook/
+            Plots/
+            Data/
