@@ -3,6 +3,8 @@ from typing import Dict
 from .eisImport import EisData
 from .eisPreprocess import disambiguateLabel
 
+ABSOLUTE_ZERO_CELSIUS = 273.15
+
 
 def splitByBatch(eisData: Dict[str, EisData]) -> Dict[str, Dict[str, EisData]]:
     """
@@ -101,3 +103,22 @@ def getSoC(spectra: str) -> str:
     disambiguation = disambiguateLabel(spectra)
     mapIndex = disambiguation.batteryBatch + disambiguation.batteryNumber
     return socMap[mapIndex]
+
+
+def getSocNumeric(spectra: str) -> float:
+    """
+    Returns the state of charge (SoC) of the battery (0-1).
+    """
+
+    return float(getSoC(spectra)[:-1]) / 100
+
+
+def getTemperatureNumeric(spectra: str) -> float:
+    """
+    Returns the set temperature of the battery in kelvin.
+    """
+    disambiguation = disambiguateLabel(spectra)
+    if disambiguation.temperature.startswith("RT"):
+        return 25.0 + ABSOLUTE_ZERO_CELSIUS
+    else:
+        return int(disambiguation.temperature) + ABSOLUTE_ZERO_CELSIUS
