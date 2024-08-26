@@ -13,7 +13,7 @@ jobs:
     name: Execute Notebook/main.ipynb
     runs-on: macos-13 # 14GB RAM required
 
-    timeout-minutes: 10
+    timeout-minutes: 20
 
     defaults:
       run:
