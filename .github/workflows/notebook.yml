@@ -44,7 +44,10 @@ jobs:
           jupyter kernelspec list
 
       - name: Execute Jupyter Notebook
-        run: jupyter nbconvert --to notebook --execute --inplace Notebook/main.ipynb
+        run: |
+          jupyter nbconvert --to notebook --execute --inplace Notebook/main.ipynb
+          jupyter nbconvert --to html Notebook/main.ipynb
+          jupyter nbconvert --to pdf Notebook/main.ipynb
 
       - name: Upload Output
         uses: actions/upload-artifact@v4
