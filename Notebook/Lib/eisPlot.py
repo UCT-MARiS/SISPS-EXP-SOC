@@ -269,3 +269,53 @@ def plotEisTestTemperatureRanges(
         fig.savefig(savePath)
 
     return fig
+
+
+def plotBode(
+    eis: Dict[str, EisData],
+    title: str = "Bode Plot",
+    **pltParams,
+) -> Figure:
+    """
+    Plots the EIS spectral data with a Bode plot.
+
+    Args:
+        eis (Dict[str, EisData]): A dictionary containing EIS spectral data.
+        title (str): The title of the plot (placed above ax[0]).
+        **pltParams: Additional parameters to pass to each plotting axis.
+
+    Returns:
+        Figure: The matplotlib Figure object containing the generated plot.
+    """
+
+    fig, ax = plt.subplots(2, 1, sharex=True)
+
+    for spectra in eis:
+        eis[spectra].data.plot(
+            x="ActFreq",
+            y="NomVal1",
+            marker=".",
+            logx=True,
+            ax=ax[0],
+            ylabel="Magnitude (Ω)",
+            label=spectra,
+            grid=True,
+            **pltParams,
+        )
+        ax[0].legend(loc="upper left", bbox_to_anchor=(1, 1))
+        ax[0].title.set_text(title)
+
+        eis[spectra].data.plot(
+            x="ActFreq",
+            y="Phase1",
+            marker=".",
+            logx=True,
+            xlabel="Frequency (Hz)",
+            ax=ax[1],
+            ylabel="Phase (°)",
+            legend=False,
+            grid=True,
+            **pltParams,
+        )
+
+    return fig
