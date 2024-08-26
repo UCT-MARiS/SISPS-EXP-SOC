@@ -288,7 +288,12 @@ def plotBode(
         Figure: The matplotlib Figure object containing the generated plot.
     """
 
-    fig, ax = plt.subplots(2, 1, sharex=True)
+    fig, ax = plt.subplots(
+        2,
+        1,
+        sharex=True,
+        figsize=(12, 8),
+    )
 
     for spectra in eis:
         eis[spectra].data.plot(
