@@ -59,4 +59,4 @@ jobs:
             Data/
 
       - name: Write Notebook as Job Summary
-        run: cat Notebook/main.ipynb >> $GITHUB_STEP_SUMMARY
+        run: cat Notebook/main.md >> $GITHUB_STEP_SUMMARY
