@@ -169,9 +169,9 @@ def plotIndividualNyquist(
     Returns:
         None
 
-    This function is parallelized to speed up the plotting process and is intended for long dictionaries only.
-
-    If the specified save directory does not exist, it will be created. If it already exists, the function will skip the plotting process (speeds up re-runs).
+    Note:
+        - This function is parallelized to speed up the plotting process and is intended for long dictionaries only.
+        - If the specified save directory does not exist, it will be created. If it already exists, the function will skip the plotting process (speeds up re-runs).
     """
     if os.path.exists(saveDir) == False:
         with futures.ThreadPoolExecutor() as executor:
