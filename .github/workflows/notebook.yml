@@ -47,7 +47,7 @@ jobs:
         run: |
           jupyter nbconvert --to notebook --execute --inplace Notebook/main.ipynb
           jupyter nbconvert --to html Notebook/main.ipynb
-          jupyter nbconvert --to pdf Notebook/main.ipynb
+          jupyter nbconvert --to markdown Notebook/main.ipynb
 
       - name: Upload Output
         uses: actions/upload-artifact@v4
@@ -57,3 +57,6 @@ jobs:
             Notebook/
             Plots/
             Data/
+
+      - name: Write Notebook as Job Summary
+        run: cat Notebook/main.ipynb >> $GITHUB_STEP_SUMMARY
