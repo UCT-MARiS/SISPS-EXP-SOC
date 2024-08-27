@@ -6,7 +6,7 @@ from .eisPreprocess import disambiguateLabel
 ABSOLUTE_ZERO_CELSIUS = 273.15
 
 
-def splitByBatch(eisData: Dict[str, EisData]) -> Dict[str, Dict[str, EisData]]:
+def groupByBatch(eisData: Dict[str, EisData]) -> Dict[str, Dict[str, EisData]]:
     """
     Splits EIS data sets by batch number.
 
@@ -26,7 +26,7 @@ def splitByBatch(eisData: Dict[str, EisData]) -> Dict[str, Dict[str, EisData]]:
     return eisByBatch
 
 
-def splitByTemperature(eisData: Dict[str, EisData]) -> Dict[str, Dict[str, EisData]]:
+def groupByTemperature(eisData: Dict[str, EisData]) -> Dict[str, Dict[str, EisData]]:
     """
     Splits EIS data sets by temperature.
 
@@ -46,7 +46,7 @@ def splitByTemperature(eisData: Dict[str, EisData]) -> Dict[str, Dict[str, EisDa
     return eisByTemperature
 
 
-def splitByBatteryNumber(eisData: Dict[str, EisData]) -> Dict[str, Dict[str, EisData]]:
+def groupByBatteryNumber(eisData: Dict[str, EisData]) -> Dict[str, Dict[str, EisData]]:
     """
     Splits EIS data sets by battery number.
 
