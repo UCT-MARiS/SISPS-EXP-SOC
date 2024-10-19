@@ -10,6 +10,7 @@ from matplotlib.axes import Axes
 import pandas as pd
 
 from .eisImport import EisData
+from .eisAnalysis import groupByBatch, groupByTemperature, groupByBatteryNumber, getSoC
 
 
 def plotNyquist(
@@ -321,6 +322,107 @@ def plotBode(
             legend=False,
             grid=True,
             **pltParams,
+        )
+
+    return fig
+
+
+def getDcVoltage(eis: EisData) -> float:
+    return eis.data["U1"].mean()
+
+
+def plotDcVoltageByBattery(
+    eis: Dict[str, EisData],
+    savePath: str | None = None,
+) -> Figure:
+    eisByBatch = groupByBatch(eis)
+
+    fig, ax = plt.subplots(2, 1, figsize=(12, 8))
+    fig.suptitle("DC Voltage Over SoC by Battery")
+    # Set x-axis to percentage formatting
+    [
+        axis.xaxis.set_major_formatter(plt.FuncFormatter(lambda x, _: f"{x:.0%}"))
+        for axis in ax
+    ]
+
+    for batch in eisByBatch:
+        eisByTemperature = groupByTemperature(eisByBatch[batch])
+
+        for temperature in eisByTemperature:
+            voltageOverSoc = pd.DataFrame(
+                {
+                    spectra.metadata["SoC"]: getDcVoltage(spectra)
+                    for spectra in eisByTemperature[temperature].values()
+                }.items(),
+                columns=["SoC", "DcVoltage"],
+            )
+
+            voltageOverSoc.plot(
+                x="SoC",
+                y="DcVoltage",
+                label=temperature,
+                ax=ax[0] if batch == "A" else ax[1],
+                marker=".",
+                grid=True,
+                # Percentage value for x axis
+            )
+
+    if savePath:
+        fig.savefig(
+            savePath,
+            transparent=True,
+        )
+
+    return fig
+
+
+def plotDcVoltageByTemperature(
+    eis: Dict[str, EisData],
+    savePath: str | None = None,
+) -> Figure:
+    """
+    Plots the DC voltage over temperature for each battery in each batch.
+
+    Args:
+        eis (Dict[str, EisData]): A dictionary containing EIS spectral data.
+        savePath (str | None): The path to save the plot image. Defaults to None.
+    """
+    eisByBatch = groupByBatch(eis)
+
+    fig, ax = plt.subplots(2, 1, figsize=(12, 8))
+    fig.suptitle("DC Voltage over Temperature")
+
+    for batch in eisByBatch:
+        eisByBattery = groupByBatteryNumber(eisByBatch[batch])
+
+        for battery in eisByBattery:
+            voltageOverTemp = pd.DataFrame(
+                {
+                    spectra.metadata["SetTemperature"] - 273.15: getDcVoltage(spectra)
+                    for spectra in eisByBattery[battery].values()
+                }.items(),
+                columns=["Temperature", "DcVoltage"],
+            )
+
+            voltageOverTemp = voltageOverTemp.sort_values(by="Temperature")
+            voltageOverTemp.plot(
+                x="Temperature",
+                y="DcVoltage",
+                ax=ax[0] if batch == "A" else ax[1],
+                xlabel="Temperature (°C)",
+                ylabel="DC Voltage (V)",
+                marker=".",
+                grid=True,
+                label=getSoC(list(eisByBattery[battery].keys())[0]),
+            )
+
+    ax[0].legend(loc="upper left", bbox_to_anchor=(1, 1))
+    ax[1].legend(loc="upper left", bbox_to_anchor=(1, 1))
+
+    if savePath:
+        fig.savefig(
+            savePath,
+            transparent=True,
         )
 
     return fig
