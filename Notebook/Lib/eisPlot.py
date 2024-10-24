@@ -331,6 +331,24 @@ def getDcVoltage(eis: EisData) -> float:
     return eis.data["U1"].mean()
 
 
+def mergeAxisYLim(ax1: Axes, ax2: Axes) -> None:
+    """
+    Merges the y-axis limits of two matplotlib Axes objects.
+
+    Args:
+        ax1 (Axes): The first matplotlib Axes object.
+        ax2 (Axes): The second matplotlib Axes object.
+
+    Returns:
+        None
+    """
+    ax1.set_ylim(
+        min(ax1.get_ylim()[0], ax2.get_ylim()[0]),
+        max(ax1.get_ylim()[1], ax2.get_ylim()[1]),
+    )
+    ax2.set_ylim(ax1.get_ylim())
+
+
 def plotDcVoltageByBattery(
     eis: Dict[str, EisData],
     savePath: str | None = None,
@@ -366,6 +384,9 @@ def plotDcVoltageByBattery(
                 grid=True,
                 # Percentage value for x axis
             )
+
+    # link axes scales
+    mergeAxisYLim(ax[0], ax[1])
 
     if savePath:
         fig.savefig(
@@ -418,6 +439,7 @@ def plotDcVoltageByTemperature(
 
     ax[0].legend(loc="upper left", bbox_to_anchor=(1, 1))
     ax[1].legend(loc="upper left", bbox_to_anchor=(1, 1))
+    mergeAxisYLim(ax[0], ax[1])
 
     if savePath:
         fig.savefig(
