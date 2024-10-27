@@ -327,6 +327,36 @@ def plotBode(
     return fig
 
 
+def plotConstantTempVariedSocBodePerBatch(
+    eisByTemp: Dict[str, Dict[str, EisData]],
+    temp: str,
+    saveDir: str,
+    **pltParams,
+) -> Dict[str, Figure]:
+    batchSplit = groupByBatch(eisByTemp[temp])
+
+    os.makedirs(saveDir, exist_ok=True)
+
+    batchFigures = {}
+
+    for batch in batchSplit:
+        fig = plotBode(
+            batchSplit[batch],
+            title=f"Batch {batch}, {temp}",
+            **pltParams,
+        )
+
+        batchFigures[batch] = fig
+
+        fig.savefig(
+            f"{saveDir}/{batch}{temp}.png",
+            transparent=True,
+            bbox_inches="tight",
+        )
+
+    return batchFigures
+
+
 def getDcVoltage(eis: EisData) -> float:
     return eis.data["U1"].mean()
 
