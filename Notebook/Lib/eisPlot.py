@@ -421,7 +421,7 @@ def plotDcVoltageByBattery(
     if savePath:
         fig.savefig(
             savePath,
-            transparent=True,
+            transparent=False,
         )
 
     return fig
@@ -474,7 +474,7 @@ def plotDcVoltageByTemperature(
     if savePath:
         fig.savefig(
             savePath,
-            transparent=True,
+            transparent=False,
         )
 
     return fig
