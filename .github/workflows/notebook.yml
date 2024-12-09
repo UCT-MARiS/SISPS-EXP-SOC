@@ -43,11 +43,15 @@ jobs:
           jupyter kernelspec install --user ./.conda --name .conda
           jupyter kernelspec list
 
-      - name: Execute Jupyter Notebook
+      - name: Execute Jupyter Notebooks
         run: |
           jupyter nbconvert --to notebook --execute --inplace Notebook/main.ipynb
+          jupyter nbconvert --to notebook --execute --inplace Notebook/concentrationPlots.ipynb
           jupyter nbconvert --to html Notebook/main.ipynb
           jupyter nbconvert --to markdown Notebook/main.ipynb
+          jupyter nbconvert --to html Notebook/concentrationPlots.ipynb
+          jupyter nbconvert --to markdown Notebook/concentrationPlots.ipynb
+
 
       - name: Upload Output
         uses: actions/upload-artifact@v4
@@ -59,4 +63,6 @@ jobs:
             Data/
 
       - name: Write Notebook as Job Summary
-        run: cat Notebook/main.md >> $GITHUB_STEP_SUMMARY
+        run: |
+          cat Notebook/main.md >> $GITHUB_STEP_SUMMARY
+          cat Notebook/concentrationPlots.md >> $GITHUB_STEP_SUMMARY
