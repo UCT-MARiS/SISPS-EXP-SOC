@@ -52,7 +52,6 @@ jobs:
           jupyter nbconvert --to html Notebook/concentrationPlots.ipynb
           jupyter nbconvert --to markdown Notebook/concentrationPlots.ipynb
 
-
       - name: Upload Output
         uses: actions/upload-artifact@v4
         with:
