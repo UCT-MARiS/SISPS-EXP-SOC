@@ -15,8 +15,8 @@ from .eisAnalysis import groupByBatch, groupByTemperature, groupByBatteryNumber,
 
 def plotNyquist(
     eis: Dict[str, EisData],
-    realLabel="Real Impedance (mΩ)",
-    imagLabel="Imaginary Impedance (mΩ)",
+    realLabel="Real Impedance",
+    imagLabel="Imaginary Impedance",
     ax: Axes | None = None,
     scatter: bool = False,
     limitFrequencyLabels: bool = False,
@@ -25,6 +25,7 @@ def plotNyquist(
     transparent: bool = False,
     title: str | None = None,
     figsize: Tuple[int, int] = (16, 12),
+    paperMode: bool = False,
 ) -> Axes | None:
     """
     Plots the EIS spectral data with a Nyquist scatter plot.
@@ -84,7 +85,7 @@ def plotNyquist(
             y="Zimg1",
             marker=".",
             ax=ax,
-            label=spectra,
+            label=spectra if not paperMode else f"{getPaperLabel(spectra)}",
         )
         ax = plot
         if limitFrequencyLabels:
@@ -226,12 +227,13 @@ def plotEisTestTemperatureRanges(
     eisObservations: Dict[str, Dict[str, pd.DataFrame]],
     saveDir: str | None = None,
     fileName: str | None = None,
+    figsize: Tuple[int, int] = (16, 32),
 ) -> plt.Figure:
     fig, ax = plt.subplots(
         2,
         1,
         sharex=True,
-        figsize=(16, 32),
+        figsize=figsize,
         # squeeze=True,
     )
     fig.suptitle("EIS Test Temperatures")
@@ -387,11 +389,10 @@ def plotDcVoltageByBattery(
 
     fig, ax = plt.subplots(2, 1, figsize=(12, 8))
     fig.suptitle("DC Voltage Over SoC by Battery")
-    # Set x-axis to percentage formatting
-    [
+
+    for axis in ax:
         axis.xaxis.set_major_formatter(plt.FuncFormatter(lambda x, _: f"{x:.0%}"))
-        for axis in ax
-    ]
+        axis.yaxis.set_major_formatter(plt.FuncFormatter(lambda y, _: f"{y:.1f}V"))
 
     for batch in eisByBatch:
         eisByTemperature = groupByTemperature(eisByBatch[batch])
@@ -408,7 +409,7 @@ def plotDcVoltageByBattery(
             voltageOverSoc.plot(
                 x="SoC",
                 y="DcVoltage",
-                label=temperature,
+                label=f"{getTemperatureLabel(temperature)}",
                 ax=ax[0] if batch == "A" else ax[1],
                 marker=".",
                 grid=True,
@@ -478,3 +479,13 @@ def plotDcVoltageByTemperature(
         )
 
     return fig
+
+
+def getTemperatureLabel(temperature: str) -> str:
+    """
+    Returns the set temperature label for plotting.
+    """
+    if temperature.startswith("RT"):
+        return "25-28°C"
+    else:
+        return f"{temperature}°C"

@@ -105,6 +105,34 @@ def getSoC(spectra: str) -> str:
     return socMap[mapIndex]
 
 
+def getPaperLabel(spectra: str) -> str:
+    """
+    Returns the alternative label for external use.
+
+    Args:
+            spectra (str): The EIS spectra name.
+
+    Returns:
+            str: The paper label of the battery.
+    """
+    disambiguation = disambiguateLabel(spectra)
+    return f"{disambiguation.batteryBatch}{disambiguation.batteryNumber} ({getSoC(spectra)})"
+
+
+def getSocByNumber(number: int) -> str:
+    """
+    Returns the state of charge (SoC) of the battery.
+
+    Args:
+            number (int): The number of the battery.
+
+    Returns:
+            str: The state of charge (SoC) of the battery.
+    """
+    mapIndex = "A" + f"{number:02d}"
+    return socMap[mapIndex]
+
+
 def getSocNumeric(spectra: str) -> float:
     """
     Returns the state of charge (SoC) of the battery (0-1).
