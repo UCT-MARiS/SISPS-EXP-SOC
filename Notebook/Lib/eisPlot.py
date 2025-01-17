@@ -10,7 +10,13 @@ from matplotlib.axes import Axes
 import pandas as pd
 
 from .eisImport import EisData
-from .eisAnalysis import groupByBatch, groupByTemperature, groupByBatteryNumber, getSoC
+from .eisAnalysis import (
+    groupByBatch,
+    groupByTemperature,
+    groupByBatteryNumber,
+    getSoC,
+    getPaperLabel,
+)
 
 
 def plotNyquist(
