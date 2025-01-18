@@ -3,6 +3,10 @@ name: Jupyter Notebook Execute
 on:
   workflow_dispatch:
   workflow_call:
+    inputs:
+      submodule_path:
+        description: "Path the this `SISPS-EXP-SOC` submodule in the parent calling repository."
+        type: string
   push:
     paths:
       - "Notebook/**"
@@ -25,13 +29,19 @@ jobs:
 
     steps:
       - name: Checkout
+        if: ${{ github.event_name != 'workflow_call' }}
         uses: actions/checkout@v4
+
+      - name: Move to Submodule
+        if: ${{ github.event_name == 'workflow_call' }}
+        run: |
+          cd ${{ github.workspace }}/$submodule_path
+          ls -a
 
       - name: Install TexLive
         uses: zauguin/install-texlive@v3
         with:
           packages: |
-            scheme-basic
             underscore
 
       - name: Set up Anaconda
