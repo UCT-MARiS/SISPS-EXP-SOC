@@ -31,6 +31,7 @@ jobs:
     defaults:
       run:
         shell: bash -el {0} # Required by conda-incubator/setup-miniconda
+        working-directory: ${{ inputs.submodule_path != '' && inputs.submodule_path || '.' }}
 
     steps:
       - name: Checkout (Parent)
@@ -50,10 +51,6 @@ jobs:
       - name: Checkout (Main)
         if: ${{ inputs.calling_repo == '' }}
         uses: actions/checkout@v4
-
-      - name: Move to Submodule if Workflow Called
-        if: ${{ inputs.submodule_path != '' }}
-        run: cd ${{ inputs.submodule_path }}
 
       - name: Install TexLive
         uses: zauguin/install-texlive@v3
