@@ -33,13 +33,19 @@ jobs:
         shell: bash -el {0} # Required by conda-incubator/setup-miniconda
 
     steps:
-      - name: Checkout (Submodule)
+      - name: Checkout (Parent)
         if: ${{ inputs.calling_repo != '' }}
         uses: actions/checkout@v4
         with:
-          submodules: true
           repository: ${{ inputs.calling_repo }}
+
+      - name: Checkout (Submodule)
+        if: ${{ inputs.submodule_path != '' }}
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ env.REPO_OWNER }}/SISPS-EXP-SOC
           token: ${{ secrets.SISPS_EXP_SOC_TOKEN }}
+          path: ${{ inputs.submodule_path }}
 
       - name: Checkout (Main)
         if: ${{ inputs.calling_repo == '' }}
