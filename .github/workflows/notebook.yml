@@ -8,6 +8,11 @@ on:
         description: "Path to Submodule"
         required: true
         type: string
+      calling_repo:
+        description: "Calling Repository Owner/Name"
+        required: true
+        type: string
+        default: "LawrenceStanton/SISPS-EXP-SOC"
   push:
     paths:
       - "Notebook/**"
@@ -33,6 +38,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           submodules: true
+          repository: ${{ inputs.calling_repo }}
 
       - name: Move to Submodule if Workflow Called
         if: ${{ inputs.submodule_path != '' }}
