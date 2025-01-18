@@ -2,6 +2,7 @@ name: Jupyter Notebook Execute
 
 on:
   workflow_dispatch:
+  workflow_call:
   push:
     paths:
       - "Notebook/**"
@@ -60,6 +61,12 @@ jobs:
             Notebook/
             Plots/
             Data/
+
+      - name: Upload PGF Plots
+        uses: actions/upload-artifact@v4
+        with:
+          name: PGF Plots
+          path: Plots/Latex/
 
       - name: Write Notebook as Job Summary
         run: |
