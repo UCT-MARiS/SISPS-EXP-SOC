@@ -26,9 +26,12 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
+      - name: Install TexLive
+        uses: zauguin/install-texlive@v3
         with:
-          repository: ${{env.REPO_OWNER}}/SISPS-EXP-SOC
-          token: ${{secrets.GITHUB_TOKEN}}
+          packages: >
+            scheme-basic
 
       - name: Set up Anaconda
         uses: conda-incubator/setup-miniconda@v3
