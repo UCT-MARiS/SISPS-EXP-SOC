@@ -3,15 +3,6 @@ name: Jupyter Notebook Execute
 on:
   workflow_dispatch:
   workflow_call:
-    inputs:
-      submodule_path:
-        description: "Path to Submodule"
-        required: true
-        type: string
-      calling_repo:
-        description: "Calling Repository Owner/Name"
-        required: true
-        type: string
   push:
     paths:
       - "Notebook/**"
@@ -31,25 +22,17 @@ jobs:
     defaults:
       run:
         shell: bash -el {0} # Required by conda-incubator/setup-miniconda
-        working-directory: ${{ inputs.submodule_path != '' && inputs.submodule_path || '.' }}
 
     steps:
-      - name: Checkout (Parent)
-        if: ${{ inputs.calling_repo != '' }}
-        uses: actions/checkout@v4
-        with:
-          repository: ${{ inputs.calling_repo }}
-
       - name: Checkout (Submodule)
-        if: ${{ inputs.submodule_path != '' }}
+        if: ${{ github.event_name == 'workflow_call' }}
         uses: actions/checkout@v4
         with:
           repository: ${{ env.REPO_OWNER }}/SISPS-EXP-SOC
           token: ${{ secrets.SISPS_EXP_SOC_TOKEN }}
-          path: ${{ inputs.submodule_path }}
 
       - name: Checkout (Main)
-        if: ${{ inputs.calling_repo == '' }}
+        if: ${{ github.event_name != 'workflow_call' }}
         uses: actions/checkout@v4
 
       - name: Install TexLive
@@ -61,8 +44,8 @@ jobs:
       - name: Set up Anaconda
         uses: conda-incubator/setup-miniconda@v3
         with:
-          activate-environment: ${{inputs.submodule_path}}/.conda
-          environment-file: ${{inputs.submodule_path}}Notebook/environment.yml
+          activate-environment: ./.conda
+          environment-file: Notebook/environment.yml
           python-version: 3.11
           auto-activate-base: false
 
