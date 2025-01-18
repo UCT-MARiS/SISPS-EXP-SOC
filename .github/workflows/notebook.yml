@@ -3,6 +3,12 @@ name: Jupyter Notebook Execute
 on:
   workflow_dispatch:
   workflow_call:
+    inputs:
+      called:
+        description: "Check for called workflow"
+        required: true
+        type: boolean
+        default: false
   push:
     paths:
       - "Notebook/**"
@@ -25,14 +31,14 @@ jobs:
 
     steps:
       - name: Checkout (Submodule)
-        if: ${{ github.event.workflow_call != null }}
+        if: ${{ inputs.called == true }}
         uses: actions/checkout@v4
         with:
           repository: ${{ env.REPO_OWNER }}/SISPS-EXP-SOC
           token: ${{ secrets.SISPS_EXP_SOC_TOKEN }}
 
       - name: Checkout (Main)
-        if: ${{ github.event.workflow_call == null }}
+        if: ${{ inputs.called == false }}
         uses: actions/checkout@v4
 
       - name: Install TexLive
