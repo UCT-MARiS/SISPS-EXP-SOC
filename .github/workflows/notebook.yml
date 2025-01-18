@@ -29,13 +29,13 @@ jobs:
 
     steps:
       - name: Checkout
-        if: ${{ github.event_name != 'workflow_call' }}
+        if: ${{ inputs.submodule_path == '' }}
         uses: actions/checkout@v4
 
       - name: Move to Submodule
-        if: ${{ github.event_name == 'workflow_call' }}
+        if: ${{ inputs.submodule_path != '' }}
         run: |
-          cd ${{ github.workspace }}/$submodule_path
+          cd ${{ inputs.submodule_path }}
           ls -a
 
       - name: Install TexLive
