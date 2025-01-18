@@ -25,6 +25,7 @@ jobs:
 
     steps:
       - name: Checkout
+        if: github.event_name != 'workflow_call'
         uses: actions/checkout@v4
         with:
           repository: ${{env.REPO_OWNER}}/SISPS-EXP-SOC
