@@ -3,6 +3,11 @@ name: Jupyter Notebook Execute
 on:
   workflow_dispatch:
   workflow_call:
+    inputs:
+      submodule_path:
+        description: "Path to Submodule"
+        required: true
+        type: string
   push:
     paths:
       - "Notebook/**"
@@ -27,7 +32,11 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          repository: ${{env.REPO_OWNER}}/SISPS-EXP-SOC
+          submodules: true
+
+      - name: Move to Submodule if Workflow Called
+        if: ${{ inputs.submodule_path != '' }}
+        run: cd ${{ inputs.submodule_path }}
 
       - name: Install TexLive
         uses: zauguin/install-texlive@v3
