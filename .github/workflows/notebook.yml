@@ -39,6 +39,7 @@ jobs:
         with:
           submodules: true
           repository: ${{ inputs.calling_repo }}
+          token: ${{ secrets.SISPS_EXP_SOC_TOKEN }}
 
       - name: Move to Submodule if Workflow Called
         if: ${{ inputs.submodule_path != '' }}
