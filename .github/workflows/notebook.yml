@@ -9,6 +9,9 @@ on:
       - "Data/**"
       - ".github/workflows/notebook.yml"
 
+env:
+  REPO_OWNER: LawrenceStanton
+
 jobs:
   main:
     name: Execute Notebook/main.ipynb
@@ -23,6 +26,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          repository: ${{env.REPO_OWNER}}/SISPS-EXP-SOC
 
       - name: Set up Anaconda
         uses: conda-incubator/setup-miniconda@v3
