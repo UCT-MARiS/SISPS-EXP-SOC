@@ -14,7 +14,7 @@ env:
 
 jobs:
   main:
-    name: Execute Notebook/main.ipynb
+    name: Execute Notebooks
     runs-on: macos-13 # 14GB RAM required
 
     timeout-minutes: 20
@@ -25,10 +25,10 @@ jobs:
 
     steps:
       - name: Checkout
-        if: github.event_name != 'workflow_call'
         uses: actions/checkout@v4
         with:
           repository: ${{env.REPO_OWNER}}/SISPS-EXP-SOC
+          token: ${{secrets.GITHUB_TOKEN}}
 
       - name: Set up Anaconda
         uses: conda-incubator/setup-miniconda@v3
