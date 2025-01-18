@@ -3,10 +3,6 @@ name: Jupyter Notebook Execute
 on:
   workflow_dispatch:
   workflow_call:
-    inputs:
-      submodule_path:
-        description: "Path the this `SISPS-EXP-SOC` submodule in the parent calling repository."
-        type: string
   push:
     paths:
       - "Notebook/**"
@@ -29,14 +25,9 @@ jobs:
 
     steps:
       - name: Checkout
-        if: ${{ inputs.submodule_path == '' }}
         uses: actions/checkout@v4
-
-      - name: Move to Submodule
-        if: ${{ inputs.submodule_path != '' }}
-        run: |
-          cd ${{ inputs.submodule_path }}
-          ls -a
+        with:
+          repository: ${{env.REPO_OWNER}}/SISPS-EXP-SOC
 
       - name: Install TexLive
         uses: zauguin/install-texlive@v3
