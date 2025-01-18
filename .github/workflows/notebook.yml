@@ -45,6 +45,7 @@ jobs:
         uses: zauguin/install-texlive@v3
         with:
           packages: |
+            scheme-basic
             underscore
 
       - name: Set up Anaconda
