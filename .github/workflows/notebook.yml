@@ -61,8 +61,8 @@ jobs:
       - name: Set up Anaconda
         uses: conda-incubator/setup-miniconda@v3
         with:
-          activate-environment: ./.conda
-          environment-file: Notebook/environment.yml
+          activate-environment: ${{inputs.submodule_path}}/.conda
+          environment-file: ${{inputs.submodule_path}}Notebook/environment.yml
           python-version: 3.11
           auto-activate-base: false
 
