@@ -12,7 +12,6 @@ on:
         description: "Calling Repository Owner/Name"
         required: true
         type: string
-        default: "LawrenceStanton/SISPS-EXP-SOC"
   push:
     paths:
       - "Notebook/**"
@@ -34,12 +33,17 @@ jobs:
         shell: bash -el {0} # Required by conda-incubator/setup-miniconda
 
     steps:
-      - name: Checkout
+      - name: Checkout (Submodule)
+        if: ${{ inputs.calling_repo != '' }}
         uses: actions/checkout@v4
         with:
           submodules: true
           repository: ${{ inputs.calling_repo }}
           token: ${{ secrets.SISPS_EXP_SOC_TOKEN }}
+
+      - name: Checkout (Main)
+        if: ${{ inputs.calling_repo == '' }}
+        uses: actions/checkout@v4
 
       - name: Move to Submodule if Workflow Called
         if: ${{ inputs.submodule_path != '' }}
