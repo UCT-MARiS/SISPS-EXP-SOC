@@ -8,6 +8,7 @@ from matplotlib.figure import Figure
 from matplotlib.axes import Axes
 
 import pandas as pd
+import numpy as np
 
 from .eisImport import EisData
 from .eisAnalysis import (
@@ -483,6 +484,49 @@ def plotDcVoltageByTemperature(
             savePath,
             transparent=False,
         )
+
+    return fig
+
+
+def plotHighFrequencyResistanceVsFreezingFactor(fCorrelation) -> Figure:
+    rHf = [(f, rHf) for f, (rHf, _) in fCorrelation]
+    stdRhf = [std for _, (_, std) in fCorrelation]
+    fig, ax = plt.subplots()
+    ax.scatter(
+        *zip(*rHf),
+    )
+    ax.set_xlabel(r"Freezing Factor, $F$")
+    ax.set_ylabel(r"High Frequency Resistance, $R_{HF} (m\Omega)$")
+    ax.set_xlim(left=0)
+    ax.set_ylim(bottom=0)
+    ax.grid(
+        True,
+        which="both",
+        linestyle="--",
+        linewidth=0.5,
+    )
+
+    from numpy.polynomial.polynomial import Polynomial
+
+    p = Polynomial.fit(*zip(*rHf), 1)
+    x = [min(f for f, _ in rHf), max(f for f, _ in rHf)]
+    y = p(x)
+    ax.plot(
+        x,
+        y,
+        linestyle="--",
+    )
+
+    monomial = p.convert()
+    a, b = monomial.coef[1], monomial.coef[0]
+    r2 = np.corrcoef(*zip(*rHf))[0, 1] ** 2
+    ax.text(
+        0.05,
+        0.85,
+        f"$R_{{HF}} = {a:.2f}F + {b:.2f}, (R^2 = {r2:.3f})$",
+        transform=ax.transAxes,
+        fontsize=12,
+    )
 
     return fig
 
