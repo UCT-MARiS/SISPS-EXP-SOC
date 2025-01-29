@@ -367,7 +367,7 @@ def plotConstantTempVariedSocBodePerBatch(
 
 
 def getDcVoltage(eis: EisData) -> float:
-    return eis.data["U1"].mean()
+    return np.mean([eis.data["U1"][0], eis.data["U2"][0], eis.data["U3"][0]])
 
 
 def mergeAxisYLim(ax1: Axes, ax2: Axes) -> None:
@@ -388,43 +388,75 @@ def mergeAxisYLim(ax1: Axes, ax2: Axes) -> None:
     ax2.set_ylim(ax1.get_ylim())
 
 
+from .eisAnalysis import disambiguateLabel
+
+
 def plotDcVoltageByBattery(
     eis: Dict[str, EisData],
+    cellData: Dict[str, Dict[str, float]],
     savePath: str | None = None,
+    paperMode: bool = False,
 ) -> Figure:
     eisByBatch = groupByBatch(eis)
 
-    fig, ax = plt.subplots(2, 1, figsize=(12, 8))
-    fig.suptitle("DC Voltage Over SoC by Battery")
+    fig, ax = plt.subplots(
+        2,
+        1,
+        figsize=(12, 8),
+        sharex=True,
+        sharey=True,
+    )
+
+    if not paperMode:
+        fig.suptitle("DC Voltage Over SoC by Battery")
 
     for axis in ax:
         axis.xaxis.set_major_formatter(plt.FuncFormatter(lambda x, _: f"{x:.0%}"))
-        axis.yaxis.set_major_formatter(plt.FuncFormatter(lambda y, _: f"{y:.1f}V"))
+        axis.yaxis.set_major_formatter(plt.FuncFormatter(lambda y, _: f"{y:.2f}V"))
 
     for batch in eisByBatch:
         eisByTemperature = groupByTemperature(eisByBatch[batch])
 
         for temperature in eisByTemperature:
-            voltageOverSoc = pd.DataFrame(
+            voltageOverCellConcentration = pd.DataFrame(
                 {
-                    spectra.metadata["SoC"]: getDcVoltage(spectra)
-                    for spectra in eisByTemperature[temperature].values()
+                    cellData[f"{batch}{disambiguateLabel(spectra).batteryNumber}"][
+                        "A"
+                    ]: getDcVoltage(eisByTemperature[temperature][spectra])
+                    for spectra in eisByTemperature[temperature]
                 }.items(),
-                columns=["SoC", "DcVoltage"],
+                columns=["Cell Concentration", "DcVoltage"],
             )
 
-            voltageOverSoc.plot(
-                x="SoC",
+            if paperMode:
+                voltageOverCellConcentration["DcVoltage"] /= 6
+
+            # Sort by cell concentration
+            voltageOverCellConcentration = voltageOverCellConcentration.sort_values(
+                by="Cell Concentration"
+            )
+
+            voltageOverCellConcentration.plot(
+                x="Cell Concentration",
                 y="DcVoltage",
                 label=f"{getTemperatureLabel(temperature)}",
                 ax=ax[0] if batch == "A" else ax[1],
                 marker=".",
                 grid=True,
-                # Percentage value for x axis
             )
 
-    # link axes scales
-    mergeAxisYLim(ax[0], ax[1])
+            if paperMode:
+                fig.axes[1].set_xlabel(
+                    r"Mean Cell Concentration, $A$ (\%w/w)",
+                )
+                [
+                    fig.axes[i].set_ylabel(
+                        r"Mean Cell Voltage, $E$ ($V$)",
+                    )
+                    for i in range(2)
+                ]
+                fig.axes[0].set_title("0 Cycles")
+                fig.axes[1].set_title("50 Cycles")
 
     if savePath:
         fig.savefig(
