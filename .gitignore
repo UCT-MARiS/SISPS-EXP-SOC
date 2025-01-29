@@ -2,7 +2,8 @@
 
 .vscode/settings.json
 
-Plots/
+Plots/*
+!Plots/Latex/
 
 __pycache__
 .conda
