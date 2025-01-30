@@ -3,6 +3,8 @@ from concurrent import futures
 
 from typing import Dict, Tuple, TypedDict
 
+import darkdetect
+
 import matplotlib.pyplot as plt
 from matplotlib.figure import Figure
 from matplotlib.axes import Axes
@@ -235,23 +237,25 @@ def plotEisTestTemperatureRanges(
     saveDir: str | None = None,
     fileName: str | None = None,
     figsize: Tuple[int, int] = (16, 32),
+    paperMode: bool = False,
 ) -> plt.Figure:
     fig, ax = plt.subplots(
         2,
         1,
         sharex=True,
         figsize=figsize,
-        # squeeze=True,
     )
-    fig.suptitle("EIS Test Temperatures")
-    ax[0].set_title("Batch A")
-    ax[1].set_title("Batch B")
+    if not paperMode:
+        fig.suptitle("EIS Test Temperatures")
+
+    ax[0].set_title("Batch A (0 Cycles)")
+    ax[1].set_title("Batch B (50 Cycles)")
     ax[0].grid(True)
     ax[1].grid(True)
 
     for batch in eisObservations:
         axIndex = 0 if batch == "A" else 1
-        for temperature in eisObservations[batch]:
+        for temperature in reversed(list(eisObservations[batch])):
             # Plot a bar chart of ranges "Battery Min Temperature" to "Battery Max Temperature"
             for row in eisObservations[batch][temperature].iterrows():
                 try:
@@ -260,17 +264,26 @@ def plotEisTestTemperatureRanges(
                 except ValueError:
                     continue
 
+                y = (
+                    (row[1]["Test"])
+                    if not paperMode
+                    else f"{getPaperLabel(row[1]['Test'])}, {temperature}{'°C' if not temperature[0:2] == 'RT' else ''}"
+                )
+
                 ax[axIndex].barh(
-                    y=row[1]["Test"],
+                    y=y,
                     width=maxTemp - minTemp,
                     left=minTemp,
+                    color="black" if darkdetect.isLight() else "lightgrey",
+                    edgecolor="black" if darkdetect.isLight() else "black",
                 )
 
                 if minTemp == maxTemp:
                     # Special case for when minTemp == maxTemp, plot a single point
                     ax[axIndex].scatter(
                         x=minTemp,
-                        y=row[1]["Test"],
+                        y=y,
+                        color="black" if darkdetect.isLight() else "lightgrey",
                     )
 
     if saveDir is not None:
