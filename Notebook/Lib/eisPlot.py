@@ -270,21 +270,34 @@ def plotEisTestTemperatureRanges(
                     else f"{getPaperLabel(row[1]['Test'])}, {temperature}{'°C' if not temperature[0:2] == 'RT' else ''}"
                 )
 
-                ax[axIndex].barh(
+                # ax[axIndex].barh(
+                #     y=y,
+                #     width=maxTemp - minTemp,
+                #     left=minTemp,
+                #     color="black" if darkdetect.isLight() else "lightgrey",
+                #     edgecolor="black" if darkdetect.isLight() else "black",
+                # )
+
+                tStr = disambiguateLabel(row[1]["Test"]).temperature
+                if tStr.startswith("RT"):
+                    tStr = "25"
+
+                t = float(tStr)
+                meanTemp = (maxTemp + minTemp) / 2
+
+                ax[axIndex].scatter(
+                    x=t,
                     y=y,
-                    width=maxTemp - minTemp,
-                    left=minTemp,
-                    color="black" if darkdetect.isLight() else "lightgrey",
-                    edgecolor="black" if darkdetect.isLight() else "black",
+                    color="black" if darkdetect.isLight() or paperMode else "lightgrey",
                 )
 
-                if minTemp == maxTemp:
-                    # Special case for when minTemp == maxTemp, plot a single point
-                    ax[axIndex].scatter(
-                        x=minTemp,
-                        y=y,
-                        color="black" if darkdetect.isLight() else "lightgrey",
-                    )
+                ax[axIndex].errorbar(
+                    x=meanTemp,
+                    y=y,
+                    xerr=[[meanTemp - minTemp], [maxTemp - meanTemp]],
+                    markersize=0,
+                    color="black" if darkdetect.isLight() or paperMode else "lightgrey",
+                )
 
     if saveDir is not None:
         os.makedirs(saveDir, exist_ok=True)
