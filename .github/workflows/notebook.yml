@@ -2,21 +2,11 @@ name: Jupyter Notebook Execute
 
 on:
   workflow_dispatch:
-  workflow_call:
-    inputs:
-      called:
-        description: "Check for called workflow"
-        required: true
-        type: boolean
-        default: false
   push:
     paths:
       - "Notebook/**"
       - "Data/**"
       - ".github/workflows/notebook.yml"
-
-env:
-  REPO_OWNER: LawrenceStanton
 
 jobs:
   main:
@@ -30,15 +20,7 @@ jobs:
         shell: bash -el {0} # Required by conda-incubator/setup-miniconda
 
     steps:
-      - name: Checkout (Submodule)
-        if: ${{ inputs.called == true }}
-        uses: actions/checkout@v4
-        with:
-          repository: ${{ env.REPO_OWNER }}/SISPS-EXP-SOC
-          token: ${{ secrets.SISPS_EXP_SOC_TOKEN }}
-
       - name: Checkout (Main)
-        if: ${{ inputs.called == false }}
         uses: actions/checkout@v4
 
       - name: Install TexLive
