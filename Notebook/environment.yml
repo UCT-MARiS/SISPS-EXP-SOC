@@ -9,6 +9,7 @@ dependencies:
   - pandas
   - regex
   - openpyxl
+  - tabulate
   - pip
   - pip:
       - duration
