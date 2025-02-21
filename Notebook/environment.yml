@@ -1,4 +1,4 @@
-name: SISPS-AST9AH-EIS
+name: SISPS-EXP-SOC
 channels:
   - conda-forge
   - defaults
