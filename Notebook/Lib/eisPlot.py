@@ -24,8 +24,8 @@ from .eisAnalysis import (
 
 def plotNyquist(
     eis: Dict[str, EisData],
-    realLabel="Real Impedance",
-    imagLabel="Imaginary Impedance",
+    realLabel=r"Real Impedance $(m\Omega)$",
+    imagLabel=r"Imaginary Impedance $(m\Omega)$",
     ax: Axes | None = None,
     scatter: bool = False,
     limitFrequencyLabels: bool = False,
@@ -546,12 +546,16 @@ def plotDcVoltageByTemperature(
     return fig
 
 
-def plotHighFrequencyResistanceVsFreezingFactor(fCorrelation) -> Figure:
+def plotHighFrequencyResistanceVsFreezingFactor(
+    fCorrelation,
+    paperMode: bool = False,
+) -> Figure:
     rHf = [(f, rHf) for f, (rHf, _) in fCorrelation]
     stdRhf = [std for _, (_, std) in fCorrelation]
     fig, ax = plt.subplots()
     ax.scatter(
         *zip(*rHf),
+        color="black" if paperMode else None,
     )
     ax.set_xlabel(r"Freezing Factor, $F$")
     ax.set_ylabel(r"High Frequency Resistance, $R_{HF} (m\Omega)$")
@@ -573,6 +577,7 @@ def plotHighFrequencyResistanceVsFreezingFactor(fCorrelation) -> Figure:
         x,
         y,
         linestyle="--",
+        color="black" if paperMode else None,
     )
 
     monomial = p.convert()
