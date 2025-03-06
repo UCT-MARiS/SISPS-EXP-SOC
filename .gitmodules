@@ -1,3 +1,3 @@
 [submodule "Data"]
-	path = Data
-	url = https://github.com/LawrenceStanton/SISPS-EXP-SOC-DATA
+path = Data
+url = https://github.com/UCT-MARiS/SISPS-EXP-SOC-DATA
