@@ -1,5 +1,7 @@
 # SISPS-EXP-SOC
 
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.14981233.svg)](https://doi.org/10.5281/zenodo.14981233)
+
 Experimental Analysis of Asterion HR12-9 batteries using Electrochemical Impedance Spectroscopy (EIS).
 
 This work contributes towards the paper entitled _Observations of Freezing Lead Acid Batteries using Electrochemical Impedance Spectroscopy_ (currently submitted to the Journal of Energy Storage).
@@ -21,11 +23,6 @@ Raw data of EIS spectra, charge cycling, varied discharge, test chamber temperat
 ### Data
 
 Refer to the [submodule repository](https://github.com/UCT-MARIS/SISPS-EXP-SOC-DATA) for details.
-
-<!-- - [`Data/EIS/`](./Data/EIS/) - Contains the raw CSV data files of EIS tests.
-- [`Data/ETC/`](./Data/ETC/) - Contains the raw CSV data files of ETC history.
-- [`Data/Cycling/`](./Data/Cycling/) - Time series data of Batch B battery cycling.
-- [`Data/Varied Discharge/`](./Data/Varied%20Discharge/) - Time series data of battery varied discharge. -->
 
 ### Documentation
 
