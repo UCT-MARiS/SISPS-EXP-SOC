@@ -393,7 +393,8 @@ def plotConstantTempVariedSocBodePerBatch(
 
 
 def getDcVoltage(eis: EisData) -> float:
-    return np.mean([eis.data["U1"][0], eis.data["U2"][0], eis.data["U3"][0]])
+    # return float(np.mean([eis.data["U1"][0], eis.data["U2"][0], eis.data["U3"][0]]))
+    return eis.data["U1"].iloc[-1]
 
 
 def mergeAxisYLim(ax1: Axes, ax2: Axes) -> None:
@@ -570,7 +571,8 @@ def plotHighFrequencyResistanceVsFreezingFactor(
 
     from numpy.polynomial.polynomial import Polynomial
 
-    p = Polynomial.fit(*zip(*rHf), 1)
+    f_values, rHf_values = zip(*rHf)
+    p = Polynomial.fit(f_values, rHf_values, 1)
     x = [min(f for f, _ in rHf), max(f for f, _ in rHf)]
     y = p(x)
     ax.plot(
@@ -582,7 +584,8 @@ def plotHighFrequencyResistanceVsFreezingFactor(
 
     monomial = p.convert()
     a, b = monomial.coef[1], monomial.coef[0]
-    r2 = np.corrcoef(*zip(*rHf))[0, 1] ** 2
+    f_values, rHf_values = zip(*rHf)
+    r2 = np.corrcoef(f_values, rHf_values)[0, 1] ** 2
     ax.text(
         0.05,
         0.85,
