@@ -568,6 +568,7 @@ def plotHighFrequencyResistanceVsFreezingFactor(
         linestyle="--",
         linewidth=0.5,
     )
+    ax.xaxis.set_major_formatter(plt.FuncFormatter(lambda x, _: f"{x:.0%}"))
 
     from numpy.polynomial.polynomial import Polynomial
 
