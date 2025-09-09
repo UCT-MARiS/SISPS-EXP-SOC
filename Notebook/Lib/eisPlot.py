@@ -27,7 +27,7 @@ def plotNyquist(
     realLabel=r"Real Impedance $(m\Omega)$",
     imagLabel=r"Imaginary Impedance $(m\Omega)$",
     ax: Axes | None = None,
-    scatter: bool = False,
+    scatter: bool = True,
     limitFrequencyLabels: bool = False,
     saveDir: str | None = None,
     fileName: str | None = None,
@@ -86,15 +86,16 @@ def plotNyquist(
         raise ValueError("No EIS data provided.")
 
     for spectra in eis:
-        plot_func = (
-            eis[spectra].data.plot.scatter if scatter else eis[spectra].data.plot.line
-        )
+        plot_func = eis[
+            spectra
+        ].data.plot.line  # scatter does not cycle colors, rather just set no line later
         plot: Axes = plot_func(
             x="Zreal1",
             y="Zimg1",
             marker=".",
             ax=ax,
             label=spectra if not paperMode else f"{getPaperLabel(spectra)}",
+            linestyle="None" if scatter else "-",
         )
         ax = plot
         if limitFrequencyLabels:
@@ -140,7 +141,7 @@ def plotNyquist(
 
         plot.legend().remove()
     else:
-        plot.legend()
+        plot.legend(title="Battery (SoC)" if paperMode else None)
         if title is not None:
             plot.set_title(title)
 
