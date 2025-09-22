@@ -94,7 +94,11 @@ def plotNyquist(
             y="Zimg1",
             marker=".",
             ax=ax,
-            label=spectra if not paperMode else f"{getPaperLabel(spectra)}",
+            label=(
+                spectra
+                if not paperMode
+                else f"{getPaperLabel(spectra)} ({eis[spectra].data['SetFreq'].min():.0f}Hz-{eis[spectra].data['SetFreq'].max()/1000:.0f}kHz)"
+            ),
             linestyle="None" if scatter else "-",
         )
         ax = plot
