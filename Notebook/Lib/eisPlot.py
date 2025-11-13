@@ -556,17 +556,27 @@ def plotHighFrequencyResistanceVsFreezingFactor(
     fCorrelation,
     paperMode: bool = False,
 ) -> Figure:
-    rHf = [(f, rHf) for f, (rHf, _) in fCorrelation]
-    stdRhf = [std for _, (_, std) in fCorrelation]
     fig, ax = plt.subplots()
-    ax.scatter(
-        *zip(*rHf),
-        color="black" if paperMode else None,
-    )
+
+    # extract sorted unique temperatures from fCorrelation
+    temperatures = sorted({t for _, _, t in fCorrelation})
+
+    for t in temperatures:
+        fCorrelationTemp = [
+            (f, rHf) for f, rHf, tSample in fCorrelation if tSample == t
+        ]
+
+        ax.scatter(
+            [f[0] for f in fCorrelationTemp],
+            [rHf[0] for (_, rHf) in fCorrelationTemp],
+            label=f"{t}°C",
+        )
+
     ax.set_xlabel(r"Freezing Factor, $F$")
     ax.set_ylabel(r"High Frequency Resistance, $R_{HF} (m\Omega)$")
     ax.set_xlim(left=0)
     ax.set_ylim(bottom=0)
+    ax.legend(title="Temperature", loc="lower right")
     ax.grid(
         True,
         which="both",
@@ -577,10 +587,18 @@ def plotHighFrequencyResistanceVsFreezingFactor(
 
     from numpy.polynomial.polynomial import Polynomial
 
-    f_values, rHf_values = zip(*rHf)
+    # Extract freezing-factor (f) and R_HF values and convert to numpy arrays
+    f_values, rHf_values = zip(*[(f, rHf[0]) for f, rHf, _ in fCorrelation])
+    f_values = np.array(f_values, dtype=float)
+    rHf_values = np.array(rHf_values, dtype=float)
+
+    # Fit a 1st-degree polynomial in the original data space
     p = Polynomial.fit(f_values, rHf_values, 1)
-    x = [min(f for f, _ in rHf), max(f for f, _ in rHf)]
+
+    # Evaluate the fit on a dense grid across the freezing-factor range for a smooth line
+    x = np.linspace(f_values.min(), f_values.max(), 200)
     y = p(x)
+
     ax.plot(
         x,
         y,
@@ -590,7 +608,7 @@ def plotHighFrequencyResistanceVsFreezingFactor(
 
     monomial = p.convert()
     a, b = monomial.coef[1], monomial.coef[0]
-    f_values, rHf_values = zip(*rHf)
+    # f_values, rHf_values = zip(*rHf)
     r2 = np.corrcoef(f_values, rHf_values)[0, 1] ** 2
     ax.text(
         0.05,
