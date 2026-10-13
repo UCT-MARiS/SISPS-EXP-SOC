@@ -572,7 +572,7 @@ def plotHighFrequencyResistanceVsFreezingFactor(
             label=f"{t}°C",
         )
 
-    ax.set_xlabel(r"Freezing Factor, $F$")
+    ax.set_xlabel(r"Freezing Extent, $F$")
     ax.set_ylabel(r"High Frequency Resistance, $R_{HF} (m\Omega)$")
     ax.set_xlim(left=0)
     ax.set_ylim(bottom=0)
